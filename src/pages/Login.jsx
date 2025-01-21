@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { rootRoute } from './Axios.js';
+// import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaEyeSlash } from "react-icons/fa";
@@ -44,7 +45,7 @@ const Login = () => {
     }
 
     try {
-      const { data } = await axios.post(`/users/login`, formData);
+      const { data } = await rootRoute.post(`/users/login`, formData);
       console.log(formData);
       navigate('/');
       localStorage.setItem("user", JSON.stringify({ ...data.user, password: '' }));

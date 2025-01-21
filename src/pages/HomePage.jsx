@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Form, Input, Select, Button, Modal, message, Table, Layout, Menu, Divider, DatePicker } from 'antd';
 import { DashboardOutlined, PlusOutlined, PieChartOutlined, BarChartOutlined, LogoutOutlined, UserOutlined, EditOutlined, DeleteOutlined } 
 from '@ant-design/icons';
-import axios from 'axios';
+// import axios from 'axios';
+import {rootRoute} from './Axios.js'
 import Analytics from './Analytics';
 import Categories from './Categories';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './HomePage.css';
 
 const { Sider, Content } = Layout;
 
 const HomePage = () => {
+  const navigate = useNavigate();
+
   const [showModal, setShowModal] = useState(false);
   const [allTransaction, setAllTransaction] = useState([]);
   const [frequency, setFrequency] = useState('7');
@@ -51,8 +57,7 @@ const HomePage = () => {
 
   const getAllTransaction = async () => {
     try {
-      // const res = await axios.post('/api/v1/transactions/get-transaction', { userid: user._id, frequency, type });
-        const res = await axios.post(`/transactions/get-transaction`, { userid: user._id, frequency, type });
+      const res = await rootRoute.post(`/transactions/get-transaction`, { userid: user._id, frequency, type });
       console.log(res.data); // Log the response data to check its structure
       setAllTransaction(res.data);
       if (setAllTransaction) {
@@ -65,12 +70,13 @@ const HomePage = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('user');
-    window.location.href = '/login';
+    navigate('/login')
+    toast.success("Logged out successfully")
   };
 
   const handleDelete = async (record) => {
     try {
-      await axios.post(`/transactions/delete-transaction`, { transactionId: record._id });
+      await rootRoute.post(`/transactions/delete-transaction`, { transactionId: record._id });
       message.success('Transaction deleted successfully');
       getAllTransaction(true);
     } catch (error) {
@@ -82,11 +88,11 @@ const HomePage = () => {
     try {
       if (editable) {
         // Edit existing transaction
-        await axios.post(`/transactions/edit-transaction`, { payload: { ...values, userid: user._id }, transactionId: editable._id });
+        await rootRoute.post(`/transactions/edit-transaction`, { payload: { ...values, userid: user._id }, transactionId: editable._id });
         message.success('Transaction edited successfully');
       } else {
         // Add new transaction
-        await axios.post(`/transactions/add-transaction`, { ...values, userid: user._id });
+        await rootRoute.post(`/transactions/add-transaction`, { ...values, userid: user._id });
         message.success('Transaction added successfully');
       }
       setShowModal(false);
